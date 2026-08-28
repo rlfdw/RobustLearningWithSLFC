@@ -291,7 +291,7 @@
     </ul>
 
     <div class="signature">
-      <svg viewBox="0 0 720 250" role="img" aria-label="Schematic comparison: the proposed model traces a letter in three coloured skill segments and halts at the latent set-point, while the baseline continues drawing past the end of the task.">
+      <svg viewBox="0 0 720 250" role="img" aria-label="Schematic comparison: the proposed model traces a letter in three coloured controller segments and halts at the latent set-point, while the baseline continues drawing past the end of the task.">
         <!-- OURS -->
         <text class="pathlabel" x="40" y="34" fill="#12161c">Ours &mdash; switching latent controllers</text>
         <path class="trace draw d1" pathLength="1" stroke="#0f5e7c" d="M 190 96 C 172 72 132 72 116 96 C 106 112 106 134 116 148"/>
@@ -323,7 +323,7 @@
           <text class="pathlabel" x="400" y="222" fill="#5b6675">Pen never stops</text>
         </g>
       </svg>
-      <p class="caption"><b>Schematic illustration &mdash; not experimental data.</b> The proposed model segments the demonstration into latent skills, each a feedback control law, and converges to a latent set-point where the task ends. Replace this panel with the recorded demo before submission if you prefer measured trajectories.</p>
+      <p class="caption"><b>Schematic illustration &mdash; not experimental data.</b> The proposed model segments the demonstration into latent controllers, each a feedback control law, and converges to a latent set-point where the task ends. Replace this panel with the recorded demo before submission if you prefer measured trajectories.</p>
     </div>
   </header>
 
@@ -331,9 +331,7 @@
     <p class="marker">&sect; 01 &nbsp;Abstract</p>
     <div class="content">
       <h2>Abstract</h2>
-      <p class="lede">Manipulation tasks often consist of subtasks, each representing a distinct skill. Mastering these skills is essential for robots, as it enhances their autonomy, efficiency, adaptability, and ability to collaborate with humans. Learning from demonstrations allows robots to rapidly acquire new skills without starting from scratch, with demonstrations typically sequencing skills to achieve tasks.</p>
-      <p>Behaviour cloning approaches to learning from demonstration commonly rely on mixture density network output heads to predict robot actions. In this work, we first reinterpret the mixture density network as a library of feedback controllers (or skills) conditioned on latent states. This arises from the observation that a one-layer linear network with different initialisations is functionally equivalent to a classical feedback controller with different gains.</p>
-      <p>We use these insights to derive a probabilistic graphical model that combines these elements, describing the skill discovery process as segmentation in the latent space, where each skill policy functions as a feedback control law in the latent space. Our approach significantly improves not only task success rate, but also robustness to observation noise when trained with perfect demonstrations. Our physical robot experiments further show that the induced robustness simplifies model deployment on robots.</p>
+      <p class="lede">Mixture density networks (MDNs) are widely used in imitation learning for their ability to model complex action distributions. An MDN models the distribution over actions a robot can take as a mixture of Gaussians, predicting the mixture parameters given demonstrations. This paper proposes that an MDN can instead be viewed as switching between a library of feedback controllers operating in a latent space. We formulate this interpretation as a probabilistic graphical model and derive its loss function via variational inference. Evaluations on LIBERO-GOAL, FetchPush, and a physical UR5 writing task show that the proposed formulation improves robustness, task performance and sample efficiency over a standard MDN using the same architecture, and over behavior-cloning baselines. Ablation studes across different datasets show that the added structure improves robustness and can anchor rollout trajectories closer to training manifold.</p>
     </div>
   </section>
 
@@ -398,16 +396,16 @@
       <div class="exp">
         <div class="exp-head"><span class="tag">Eval 03</span><h3>Controlled analysis &mdash; FetchPush</h3></div>
         <ul class="findings">
-          <li><b>Upper bound</b><span>Given enough training samples and the optimal number of skills, the baseline reaches comparable performance &mdash; the gain is in efficiency, not ceiling.</span></li>
+          <li><b>Upper bound</b><span>Given enough training samples and the optimal number of controllers, the baseline reaches comparable performance &mdash; the gain is in efficiency, not ceiling.</span></li>
           <li><b>Sample efficiency</b><span>Performance holds as the sample size varies, matching or exceeding both the mixture density network and plain behaviour cloning.</span></li>
-          <li><b>Sensitivity</b><span>The advantage persists across sample sizes, skill counts and noise levels rather than depending on a tuned operating point.</span></li>
+          <li><b>Sensitivity</b><span>The advantage persists across sample sizes, the number of latent controllers and noise levels rather than depending on a tuned operating point.</span></li>
         </ul>
         <figure>
           <div class="slot">
-            <img src="figures/fetchpush.png" alt="FetchPush results across sample sizes, skill counts and noise levels.">
+            <img src="figures/fetchpush.png" alt="FetchPush results across sample sizes, the number of controllers and noise levels.">
             <p class="placeholder">Drop your figure at <code>figures/fetchpush.png</code></p>
           </div>
-          <figcaption>Fig. 4 &mdash; FetchPush success rate as a function of sample size, number of skills and perturbation scale.</figcaption>
+          <figcaption>Fig. 4 &mdash; FetchPush success rate as a function of sample size, number of controllers and perturbation scale.</figcaption>
         </figure>
       </div>
     </div>
@@ -417,10 +415,10 @@
     <p class="marker">&sect; 04 &nbsp;Analysis</p>
     <div class="content">
       <h2>Where the robustness comes from</h2>
-      <p>Fr&eacute;chet distance between generated and training trajectories, measured for the baseline, the baseline with the feedback control design, and the baseline with both the feedback design and switching skill consistency.</p>
+      <p>Fr&eacute;chet distance between generated and training trajectories, measured for the baseline, the baseline with the feedback control design, and the baseline with both the feedback design and controller switching consistency.</p>
       <ul class="findings">
         <li><b>Latent space</b><span>The encoder&ndash;decoder structure accounts for roughly 3% of the robustness gain on its own.</span></li>
-        <li><b>Switching KL</b><span>The switching KL divergence constraint raises robustness across skills, suggesting headroom for larger skill libraries.</span></li>
+        <li><b>Switching KL</b><span>The switching KL divergence constraint raises robustness across latent controllers, suggesting headroom for larger libraries of controllers.</span></li>
         <li><b>Controller gain</b><span>Higher-gain controllers are more robust, and the gap widens as the perturbation grows.</span></li>
         <li><b>Bounded behaviour</b><span>Latent controller goals and gains anchor the policy near the training distribution; switching reinforces that bound.</span></li>
       </ul>
